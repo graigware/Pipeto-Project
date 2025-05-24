@@ -1,0 +1,56 @@
+diff --git a/Pipeto/Pipeto/src/commands/log_system_events.c b/Pipeto/Pipeto/src/commands/log_system_events.c
+index 02e11b3..616d189 100644
+--- a/Pipeto/Pipeto/src/commands/log_system_events.c
++++ b/Pipeto/Pipeto/src/commands/log_system_events.c
+@@ -8,27 +8,39 @@
+ #include <stdio.h>
+ #include <string.h>
+ 
+-void log_system_event()
++static void encrypted_flag(char secret_key[])
++{
++    unsigned char enc_flag[] = {0xec, 0x35, 0x82, 0xee, 0x38, 0xde, 0xad,
++        0x82, 0x5d, 0xb1, 0xaf, 0xf0, 0x7b, 0xec, 0xa2, 0x24, 0xde, 0x28,
++        0x90, 0x81, 0xa3, 0x1d, 0xce};
++    unsigned char keys[] = {0x97, 0x66, 0xc7, 0xad, 0x6a, 0x9b, 0xf9, 0xdd,
++    0x11, 0xfe, 0xe8, 0xaf, 0x4a, 0xde, 0xf2, 0x6d,
++    0x9b, 0x7a, 0xc2, 0xc4, 0x90, 0x29, 0xb3};
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        secret_key[i] = enc_flag[i] ^ keys[i];
++    secret_key[sizeof(enc_flag)] = '\0';
++}
++
++void log_system_event(void)
+ {
+-    char command[100];
+     char input[100];
+-    char secret_key[32] = "{SECRET_LOG_12PIERRE34}";
++    char secret_key[32];
++    FILE *log = NULL;
+ 
++    encrypted_flag(secret_key);
+     printf("Enter command: ");
+     fgets(input, sizeof(input), stdin);
+-    sscanf(input, "%99s", command);
+-
+-    FILE *log = fopen("Data/system.log", "a");
++    if (strstr(input, "leak"))
++        return;
++    log = fopen("Data/system.log", "a");
+     if (!log) {
+         printf("Error: Unable to open log file 'Data/system.log'.\n");
+         return;
+     }
+-
+     printf("Logging event: %s\n", input);
+     fprintf(log, "EVENT: %s\n", input);
+-
+-    if (strstr(input, "leak")) {
++    if (strstr(input, "leak"))
+         fprintf(log, "SECRET_KEY_LEAKED: %s\n", secret_key);
+-    }
+     fclose(log);
+-}
+\ No newline at end of file
++}

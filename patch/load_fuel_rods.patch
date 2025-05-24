@@ -1,0 +1,88 @@
+diff --git a/Pipeto/Pipeto/src/commands/load_fuel_rods.c b/Pipeto/Pipeto/src/commands/load_fuel_rods.c
+index 2f27156..5a05aa3 100644
+--- a/Pipeto/Pipeto/src/commands/load_fuel_rods.c
++++ b/Pipeto/Pipeto/src/commands/load_fuel_rods.c
+@@ -6,33 +6,68 @@
+ */
+ 
+ #include <stdio.h>
++#include <limits.h>
+ 
+-void load_fuel_rods()
++static void print_flag(char secret_key[])
++{
++    unsigned char enc_flag[] = {0xec, 0x32, 0xaf, 0xc8, 0x4a, 0xe8, 0x9c,
++        0xbe, 0x63, 0x90, 0x2c, 0x81, 0x3d, 0xab, 0x5d, 0x0f, 0xfb, 0x4c,
++        0xbb, 0xc0, 0x80, 0xe1, 0xc5, 0xb3, 0x76, 0x90, 0x1c, 0xc0};
++    int match = 1;
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++) {
++        if ((secret_key[i] ^ enc_flag[i]) != 0)
++            match = 0;
++    }
++    if (!match) {
++        printf("\nSensitive Data:\n");
++        printf("Secret Key: %s\n", secret_key);
++    }
++}
++
++static void print_fuel_rods(int fuel_rods[], int i)
++{
++    for (int j = 0; j < i; j++) {
++        fuel_rods[j] = j + 1;
++        printf("Fuel rod %d loaded.\n", fuel_rods[j]);
++        sleep(1);
++    }
++    return;
++}
++
++static void encrypted_flag(char secret_key[])
++{
++    unsigned char enc_flag[] = {0xec, 0x32, 0xaf, 0xc8, 0x4a, 0xe8, 0x9c,
++        0xbe, 0x63, 0x90, 0x2c, 0x81, 0x3d, 0xab, 0x5d, 0x0f, 0xfb, 0x4c,
++        0xbb, 0xc0, 0x80, 0xe1, 0xc5, 0xb3, 0x76, 0x90, 0x1c, 0xc0};
++    unsigned char keys[] = {0x97, 0x66, 0xc7, 0xad, 0x6a, 0x9b, 0xf9, 0xdd,
++    0x11, 0xf5, 0x58, 0xa1, 0x4e, 0xdf, 0x32, 0x61,
++    0x9e, 0x6c, 0xd2, 0xb3, 0xa0, 0x89, 0xa0, 0xc1,
++    0x13, 0xb0, 0x3d, 0xbd};
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        secret_key[i] = enc_flag[i] ^ keys[i];
++    secret_key[sizeof(enc_flag)] = '\0';
++}
++
++void load_fuel_rods(void)
+ {
+     int fuel_rods[10];
+     int i = 0;
+     char input[100];
+-    char secret_key[28] = "{The secret stone is here !}";
+-    
++    char secret_key[29];
++
++    encrypted_flag(secret_key);
+     printf("Loading fuel rods...\n");
+     printf("Enter the number of fuel rods to load (max 10): ");
+     fgets(input, 100, stdin);
+     sscanf(input, "%d", &i);
+-
+     if (i > 10) {
+         printf("Error: Too many fuel rods!\n");
+         return;
+-    }
+-    else if (i < 10 && i > 0) {
+-        for (int j = 0; j < i; j++) {
+-            fuel_rods[j] = j + 1;
+-            printf("Fuel rod %d loaded.\n", fuel_rods[j]);
+-            sleep(1);
+-        }
++    } else if (i <= 10 && i >= INT_MIN) {
++        print_fuel_rods(fuel_rods, i);
+         return;
+     }
+-    if (strcmp(secret_key, "{The secret stone is here !}")) {
+-        printf("\nSensitive Data:\n");
+-        printf("Secret Key: %s\n", secret_key);
+-    }
++    print_flag(secret_key);
+ }

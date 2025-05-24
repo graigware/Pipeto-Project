@@ -1,0 +1,81 @@
+diff --git a/Pipeto/Pipeto/src/commands/run_diagnostic.c b/Pipeto/Pipeto/src/commands/run_diagnostic.c
+index 6ae157f..063e61b 100644
+--- a/Pipeto/Pipeto/src/commands/run_diagnostic.c
++++ b/Pipeto/Pipeto/src/commands/run_diagnostic.c
+@@ -8,39 +8,54 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include "pipeto.h"
+ 
+-void run_diagnostic()
++void normal_diagnostic(int *data, char sensitive_info[])
++{
++    printf("Running diagnostic...\n");
++    sleep(1);
++    if (data == NULL)
++        printf("Error: Diagnostic data is unavailable (NULL pointer).\n");
++    else if (data == (int *)sensitive_info)
++        printf("Diagnostic result: %s\n", (char *)data);
++    else
++        printf("Diagnostic result: Code %d\n", *data);
++    printf("Performing system health check...\n");
++    sleep(1);
++    printf("System health: OK\n");
++    printf("Diagnostic complete.\n");
++}
++
++static void encrypted_flag(char sensitive_info[])
++{
++    unsigned char enc_flag[] = {0xec, 0x35, 0x82, 0xee, 0x38, 0xde, 0xad,
++        0xfd, 0x55, 0xb7, 0xa9, 0xe8, 0x04, 0x91, 0xa1, 0x39, 0xd2, 0x39,
++        0xe2, 0x8f, 0xd5, 0x70, 0xce};
++    unsigned char keys[] = {0x97, 0x66, 0xc7, 0xad, 0x6a, 0x9b, 0xf9, 0xdd,
++    0x11, 0xfe, 0xe8, 0xaf, 0x4a, 0xde, 0xf2, 0x6d,
++    0x9b, 0x7a, 0xc2, 0xc4, 0x90, 0x29, 0xb3};
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        sensitive_info[i] = enc_flag[i] ^ keys[i];
++    sensitive_info[sizeof(enc_flag)] = '\0';
++}
++
++void run_diagnostic(void)
+ {
+     int *data = NULL;
+     char input[32];
+-    char sensitive_info[64] = "{SECRET DIAGNOSTIC KEY}";
++    char sensitive_info[64];
+     int diagnostic_code = 0;
+ 
++    encrypted_flag(sensitive_info);
+     printf("Enter diagnostic mode (normal/debug/advanced): ");
+     fgets(input, sizeof(input), stdin);
+     input[strcspn(input, "\n")] = '\0';
+-
+-    if (strcmp(input, "debug") == 0) {
++    if (strcmp(input, "debug") == 0 && IS_ADMIN)
+         data = (int *)sensitive_info;
+-    } else if (strcmp(input, "advanced") == 0) {
++    else if (strcmp(input, "advanced") == 0) {
+         diagnostic_code = rand() % 1000;
+         data = &diagnostic_code;
+     }
+-
+-    printf("Running diagnostic...\n");
+-    sleep(1);
+-
+-    if (data == NULL) {
+-        printf("Error: Diagnostic data is unavailable (NULL pointer).\n");
+-    } else if (data == (int *)sensitive_info) {
+-        printf("Diagnostic result: %s\n", (char *)data);
+-    } else {
+-        printf("Diagnostic result: Code %d\n", *data);
+-    }
+-
+-    printf("Performing system health check...\n");
+-    sleep(1);
+-    printf("System health: OK\n");
+-
+-    printf("Diagnostic complete.\n");
++    normal_diagnostic(data, sensitive_info);
+ }

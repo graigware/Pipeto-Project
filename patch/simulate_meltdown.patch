@@ -1,0 +1,69 @@
+diff --git a/Pipeto/Pipeto/src/commands/simulate_meltdown.c b/Pipeto/Pipeto/src/commands/simulate_meltdown.c
+index d725357..2fd5e40 100644
+--- a/Pipeto/Pipeto/src/commands/simulate_meltdown.c
++++ b/Pipeto/Pipeto/src/commands/simulate_meltdown.c
+@@ -10,32 +10,49 @@
+ #include <time.h>
+ #include <string.h>
+ 
+-void simulate_meltdown()
++void print_info_messages(int random_number, char reactor_status[])
++{
++    if (random_number < 20) {
++        printf("Warning: Reactor core temperature rising.\n");
++        strcpy(reactor_status, "Reactor Warning");
++    } else if (random_number < 50) {
++        printf("Alert: Reactor core temperature stable.\n");
++        strcpy(reactor_status, "Reactor Stable");
++    } else {
++        printf("Reactor core temperature normal.\n");
++        strcpy(reactor_status, "Reactor Normal");
++    }
++}
++
++static void encrypted_flag(char secret_code[])
++{
++    unsigned char enc_flag[] = {0xe1, 0x26, 0x72, 0xe4, 0xee, 0xd0, 0xb1,
++        0xca, 0x5f, 0xcc, 0x0a, 0x91, 0x6a, 0xa3};
++    unsigned char keys[] = {0x9a, 0x6b, 0x37, 0xa8, 0xba, 0x94, 0xfe, 0x9d,
++    0x11, 0xfd, 0x38, 0xa2, 0x5e, 0xde};
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        secret_code[i] = enc_flag[i] ^ keys[i];
++    secret_code[sizeof(enc_flag)] = '\0';
++}
++
++void simulate_meltdown(void)
+ {
+     char reactor_status[32] = "Reactor Stable";
+-    int random_number = rand() % 100;
+-    char secret_code[16] = "{MELTDOWN1234}";
++    int random_number = (rand() % 100) + 5;
++    char secret_code[16];
+ 
++    encrypted_flag(secret_code);
+     printf("Generated random number: %d\n", random_number);
+-
+     if (random_number < 10) {
+         printf("Meltdown simulated! Reactor core is overheating.\n");
+         strcpy(reactor_status, "Reactor Overheating");
+-
+         if (random_number < 5) {
+             printf("Critical Error: Secret Code Leaked: %s\n", secret_code);
+             return;
+         }
+-    } else if (random_number < 20) {
+-        printf("Warning: Reactor core temperature rising.\n");
+-        strcpy(reactor_status, "Reactor Warning");
+-    } else if (random_number < 50) {
+-        printf("Alert: Reactor core temperature stable.\n");
+-        strcpy(reactor_status, "Reactor Stable");
+-    } else {
+-        printf("Reactor core temperature normal.\n");
+-        strcpy(reactor_status, "Reactor Normal");
+-    }
++    } else
++        print_info_messages(random_number, reactor_status);
+     printf("Reactor core temperature: %d\n", random_number);
+     printf("Reactor core status: %s\n", reactor_status);
+ }

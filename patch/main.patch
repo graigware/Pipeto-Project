@@ -1,0 +1,25 @@
+diff --git a/Pipeto/Pipeto/src/main.c b/Pipeto/Pipeto/src/main.c
+index ae558ad..4f7e5ac 100644
+--- a/Pipeto/Pipeto/src/main.c
++++ b/Pipeto/Pipeto/src/main.c
+@@ -5,15 +5,8 @@
+ ** main
+ */
+ #include "pipeto.h"
+-int
+-	main
+-	(
+-			UNUSED int       ac
+-			, UNUSED char ** av
+-			)
+-	{
+-		return
+-				my_console
+-				(
+-						);
+-	}
++
++int main(UNUSED int ac, UNUSED char **v)
++{
++    return my_console();
++}

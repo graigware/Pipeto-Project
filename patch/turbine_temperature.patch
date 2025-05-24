@@ -1,0 +1,98 @@
+diff --git a/libpipeto/turbine_temperature.c b/libpipeto/turbine_temperature.c
+index 7deac55..38b80a1 100644
+--- a/libpipeto/turbine_temperature.c
++++ b/libpipeto/turbine_temperature.c
+@@ -10,31 +10,69 @@
+ #include <string.h>
+ #include <limits.h>
+ 
+-void turbine_temperature(void)
++static void encrypted_flag(void)
+ {
+-  size_t sVar1;
+-  longlong lVar2;
+-  char local_98 [140];
+-  int local_c;
+-  
+-  printf("Enter the number of degrees you want to increase or d ecrease the turbine temperature : ");
+-  fgets(local_98,0x80,_stdin);
+-  sVar1 = strcspn(local_98,"\n");
+-  local_98[sVar1] = '\0';
+-  lVar2 = strtoll(local_98,(char **)0x0,10);
+-  local_c = (int)lVar2;
+-  if ((local_c != 0x7ffffffe) && (local_c != -0x7fffffff)) {
+-    printf("Turbine temperature is %d degrees.\n",0x14);
+-    if (local_c < 0) {
+-      printf("Turbine temperature is decreasing : %d\n",(ulong)(l ocal_c + 0x14));
+-    }
+-    else if (0 < local_c) {
+-      printf("Turbine temperature is increasing : %d\n",(ulong)(lo cal_c + 0x14));
++    unsigned char enc_flag[] = {0xe8, 0x2f, 0x99, 0xbf, 0xca, 0xc0, 0x39,
++        0xd0, 0x44, 0xa3, 0x66, 0xe8, 0x90, 0xea, 0xe2, 0xe6, 0x7b, 0xa6,
++        0x70, 0xae, 0xd1, 0x87, 0xbc, 0xe7, 0xfc, 0xb2, 0xba, 0x93};
++    unsigned char keys[] = {0x93, 0x6a, 0xcb, 0xed, 0xfa, 0x92, 0x19, 0x84,
++    0x11, 0xf1, 0x24, 0xa1, 0xde, 0xaf, 0xc2, 0xb1, 0x32, 0xea, 0x3c, 0x8e,
++    0x94, 0xdf, 0xec, 0xab, 0xb3, 0xf6, 0xff, 0xee};
++    char decrypted[28];
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        decrypted[i] = enc_flag[i] ^ keys[i];
++    decrypted[27] = '\0';
++    printf("%s\n", decrypted);
++}
++
++static int add_temperature_saturate(int base_temp, int temp_delta)
++{
++    if (temp_delta > 0 && base_temp > INT_MAX - temp_delta)
++        return INT_MAX;
++    if (temp_delta < 0 && base_temp < INT_MIN - temp_delta)
++        return INT_MIN;
++    return base_temp + temp_delta;
++}
++
++static int get_temperature_delta(void)
++{
++    char input[140];
++    size_t newline_pos;
++    long long temp_delta_ll;
++
++    printf("Enter the number of degrees to increase or decrease the turbine "
++        "temperature: ");
++    if (fgets(input, sizeof(input), stdin) == NULL) {
++        printf("Error: No input provided.\n");
++        return 0;
+     }
++    newline_pos = strcspn(input, "\n");
++    input[newline_pos] = '\0';
++    temp_delta_ll = strtoll(input, NULL, 10);
++    return (int)temp_delta_ll;
++}
++
++static void display_temperature_change(int temp_delta, int new_temp)
++{
++    printf("Turbine base temperature is %d degrees.\n", 20);
++    if (temp_delta < 0)
++        printf("Turbine temperature is decreasing: %d\n", new_temp);
++    else if (temp_delta > 0)
++        printf("Turbine temperature is increasing: %d\n", new_temp);
++}
++
++void turbine_temperature(void)
++{
++    const int base_temp = 20;
++    int temp_delta;
++    int new_temp;
++
++    temp_delta = get_temperature_delta();
++    new_temp = add_temperature_saturate(base_temp, temp_delta);
++    display_temperature_change(temp_delta, new_temp);
+     return;
+-  }
+-  puts("Turbine temperature is too unstable.");
+-  puts("{ERR0R TURBINE WILL EXPLODE}");
+-                    /* WARNING: Subroutine does not return */
+-  exit(1);
++    puts("Turbine temperature is too unstable.");
++    encrypted_flag();
++    exit(1);
+ }

@@ -1,0 +1,59 @@
+diff --git a/Pipeto/Pipeto/src/commands/check_cooling_pressure.c b/Pipeto/Pipeto/src/commands/check_cooling_pressure.c
+index caf99fb..d423334 100644
+--- a/Pipeto/Pipeto/src/commands/check_cooling_pressure.c
++++ b/Pipeto/Pipeto/src/commands/check_cooling_pressure.c
+@@ -19,18 +19,32 @@ static void log_pressure_status(const char *status)
+     printf("Cooling pressure status: %s\n", status);
+ }
+ 
+-static void simulate_sensor_reading()
++static void simulate_sensor_reading(void)
+ {
+     printf("Simulating sensor reading...\n");
+     sleep(1);
+     printf("Sensor reading complete.\n");
+ }
+ 
+-void check_cooling_pressure()
++static void encrypted_flag(char sensitive_info[])
++{
++    unsigned char enc_flag[] = {0xec, 0x35, 0xa2, 0xc3, 0x19, 0xf2, 0x8d,
++        0xb4, 0x67, 0x90, 0x78, 0xe5, 0x2f, 0xab, 0x53, 0x1c};
++    unsigned char keys[] = {0x97, 0x66, 0xc7, 0xad, 0x6a, 0x9b, 0xf9, 0xdd,
++        0x11, 0xf5, 0x58, 0xa1, 0x4e, 0xdf, 0x32, 0x61};
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        sensitive_info[i] = enc_flag[i] ^ keys[i];
++    sensitive_info[sizeof(enc_flag)] = '\0';
++}
++
++void check_cooling_pressure(void)
+ {
+     char *data = (char *)malloc(16);
+-    char sensitive_info[32] = "{Sensitive Data}";
++    char t_buffer[32];
++    char sensitive_info[32];
+ 
++    encrypted_flag(sensitive_info);
+     load_data(data);
+     printf("Cooling pressure check in progress...\n");
+     sleep(2);
+@@ -38,14 +52,12 @@ void check_cooling_pressure()
+     printf("Checking cooling pressure...\n");
+     sleep(1);
+     log_pressure_status(data);
+-    free(data);
+     sleep(3);
+-    if (strcmp(data, "Pressure OK")) {
++    if (strcmp(data, "Pressure OK"))
+         printf("Sensitive Info: %s\n", sensitive_info);
+-    }
+-    char temp_buffer[32];
+-    snprintf(temp_buffer, sizeof(temp_buffer), "Temporary data: %d", rand() % 100);
+-    printf("Temporary buffer: %s\n", temp_buffer);
++    free(data);
++    snprintf(t_buffer, sizeof(t_buffer), "Temporary data: %d", rand() % 100);
++    printf("Temporary buffer: %s\n", t_buffer);
+     simulate_sensor_reading();
+     printf("Cooling pressure check complete.\n");
+ }

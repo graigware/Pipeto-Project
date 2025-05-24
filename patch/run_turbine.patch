@@ -1,0 +1,101 @@
+diff --git a/libpipeto/run_turbine.c b/libpipeto/run_turbine.c
+index 016413c..3490226 100644
+--- a/libpipeto/run_turbine.c
++++ b/libpipeto/run_turbine.c
+@@ -11,34 +11,70 @@
+ #include <time.h>
+ #include <unistd.h>
+ 
+-void run_turbine(void)
++static void encrypted_flag(void)
++{
++    unsigned char enc_flag[] = {0xec, 0x23, 0x95, 0xff, 0x5a, 0xc9, 0xd9,
++        0x89, 0x44, 0xa7, 0x1a, 0x90, 0x00, 0x9a, 0x12, 0x22, 0xea, 0x88,
++        0xf8, 0xb9, 0xc9, 0xf6, 0xe6, 0xfd, 0xff, 0x49};
++    unsigned char keys[] = {0x97, 0x66, 0xc7, 0xad, 0x6a, 0x9b, 0xf9, 0xdd,
++        0x11, 0xf5, 0x58, 0xa1, 0x4e, 0xdf, 0x32, 0x61, 0xab, 0xc6, 0xdf,
++        0xed, 0xe9, 0xa5, 0xb2, 0xcd, 0xaf, 0x34, 0x98};
++    char decrypted[27];
+ 
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        decrypted[i] = enc_flag[i] ^ keys[i];
++    decrypted[26] = '\0';
++    printf("%s\n", decrypted);
++}
++
++static int get_rotation_count(void)
+ {
+-  int iVar1;
+-  size_t sVar2;
+-  char local_98 [136];
+-  uint local_10;
+-  uint local_c;
+-  
+-  local_c = 0;
+-  printf("Enter the number of rotation that the turbine will do (b etween 0 and 15): ");
+-  fgets(local_98,0x80,_stdin);
+-  sVar2 = strcspn(local_98,"\n");
+-  local_98[sVar2] = '\0';
+-  local_10 = atoi(local_98);
+-  if ((local_10 == 0) || ((int)local_10 < 0x10)) {
+-    for (; local_c != local_10; local_c = local_c + 1) {
+-      if (0xf < local_c) {
+-        puts("{ERR0R TURB1NE CAN\'T ST0P}");
+-      }
+-      printf("Turbine is running... %d/%d\n",(ulong)(local_c + 1),( ulong)local_10);
+-      iVar1 = rand();
+-      sleep(iVar1 % 3 + 1);
++    char inputBuffer[128];
++    size_t newlinePos;
++
++    printf("Enter the number of rotations the turbine will do "
++           "(between 0 and 15): ");
++    if (fgets(inputBuffer, sizeof(inputBuffer), stdin) == NULL) {
++        printf("Error: No input provided.\n");
++        return -1;
++    }
++    newlinePos = strcspn(inputBuffer, "\n");
++    inputBuffer[newlinePos] = '\0';
++    return atoi(inputBuffer);
++}
++
++static void execute_rotation(int current, int total)
++{
++    int delaySeconds;
++
++    printf("Turbine is running... %d/%d\n", current + 1, total);
++    delaySeconds = rand() % 3 + 1;
++    sleep(delaySeconds);
++}
++
++static void run_rotations(int rotationCount)
++{
++    int currentRotation;
++
++    for (currentRotation = 0; currentRotation < rotationCount;
++         currentRotation++) {
++        if (currentRotation > 15) {
++            encrypted_flag();
++            break;
++        }
++        execute_rotation(currentRotation, rotationCount);
+     }
+     puts("Turbine has stopped.");
+-  }
+-  else {
+-    puts("Invalid number of rotations.");
+-  }
+-  return;
++}
++
++void run_turbine(void)
++{
++    int rotationCount;
++
++    srand((unsigned)time(NULL));
++    rotationCount = get_rotation_count();
++    if (rotationCount < 16 && rotationCount > 0)
++        run_rotations(rotationCount);
++    else
++        puts("Invalid number of rotations.");
+ }

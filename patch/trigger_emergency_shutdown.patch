@@ -1,0 +1,33 @@
+diff --git a/Pipeto/Pipeto/src/commands/trigger_emergency_shutdown.c b/Pipeto/Pipeto/src/commands/trigger_emergency_shutdown.c
+index 09cd07f..b462470 100644
+--- a/Pipeto/Pipeto/src/commands/trigger_emergency_shutdown.c
++++ b/Pipeto/Pipeto/src/commands/trigger_emergency_shutdown.c
+@@ -9,12 +9,26 @@
+ #include <stdlib.h>
+ #include "pipeto.h"
+ 
+-void trigger_emergency_shutdown()
++static void encrypted_flag(void)
++{
++    unsigned char enc_flag[] = {0x48, 0xf8, 0x8c, 0xa8, 0xb8, 0x86, 0x52,
++        0xd3, 0x56, 0x9c};
++    unsigned char keys[] = {0x33, 0xab, 0xc4, 0xfd, 0xec, 0xc2, 0x1d, 0x84,
++    0x18, 0xe1};
++    char decrypted[11];
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        decrypted[i] = enc_flag[i] ^ keys[i];
++    decrypted[10] = '\0';
++    printf("%s", decrypted);
++}
++
++void trigger_emergency_shutdown(void)
+ {
+     if (!IS_ADMIN) {
+         printf("You are not authorized to trigger an emergency shutdown.\n");
+         return;
+     }
+-    printf("{SHUTDOWN}");
++    encrypted_flag();
+     exit(0);
+ }

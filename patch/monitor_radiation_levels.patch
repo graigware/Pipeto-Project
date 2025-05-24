@@ -1,0 +1,75 @@
+diff --git a/Pipeto/Pipeto/src/commands/monitor_radiation_levels.c b/Pipeto/Pipeto/src/commands/monitor_radiation_levels.c
+index f7fa47d..00f3e1c 100644
+--- a/Pipeto/Pipeto/src/commands/monitor_radiation_levels.c
++++ b/Pipeto/Pipeto/src/commands/monitor_radiation_levels.c
+@@ -6,25 +6,49 @@
+ */
+ 
+ #include <stdio.h>
++#include <stdlib.h>
+ #include <string.h>
+-void secret_function ()
+-	{
+-		printf (
+-				"{The stone isn't in the pocket anymore ...}\n");
+-	}
+-void monitor_radiation_levels ()
+-	{
+-		char    buffer[10];
+-		void (* function_ptr) () = NULL;
+-		printf ("Enter radiation levels: ");
+-		gets (buffer);
+-		printf ("Radiation Levels: %s\n" ,buffer);
+-		if (function_ptr)
+-			{
+-				function_ptr();
+-			} else
+-			{
+-				printf ("Function Pointer: %p\n"
+-						,( void * ) function_ptr);
+-			}
+-	}
++#include <unistd.h>
++
++void secret_function(void)
++{
++    unsigned char enc_flag[] = {0xec, 0x32, 0xaf, 0xc8, 0x4a, 0xe8, 0x8d,
++        0xb2, 0x7f, 0x90, 0x78, 0xc8, 0x3d, 0xb1, 0x15, 0x15, 0xbe, 0x05,
++        0xbc, 0x93, 0xd4, 0xe1, 0xc5, 0xe1, 0x63, 0xdf, 0x5e, 0xd6, 0xc7,
++        0xef, 0x47, 0xc2, 0xac, 0xc8, 0xb1, 0xf3, 0x9d, 0xbe, 0xc9, 0xda,
++        0xd0, 0x94, 0x15, 0xcb, 0x08};
++    unsigned char keys[] = {0x97, 0x66, 0xc7, 0xad, 0x6a, 0x9b, 0xf9, 0xdd,
++    0x11, 0xf5, 0x58, 0xa1, 0x4e, 0xdf, 0x32, 0x61, 0x9e, 0x6c, 0xd2, 0xb3,
++    0xa0, 0x89, 0xa0, 0xc1, 0x13, 0xb0, 0x3d, 0xbd, 0xa2, 0x9b, 0x67, 0xa3,
++    0xc2, 0xb1, 0xdc, 0x9c, 0xef, 0xdb, 0xe9, 0xf4, 0xfe, 0xba, 0x68};
++    char decrypted[44];
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        decrypted[i] = enc_flag[i] ^ keys[i];
++    decrypted[43] = '\0';
++    printf("%s\n", decrypted);
++}
++
++void monitor_radiation_levels(void)
++{
++    char *buffer = NULL;
++    size_t bufsize = 0;
++    ssize_t linelen;
++    void(*function_ptr)(void) = NULL;
++
++    printf("Enter radiation levels: ");
++    linelen = getline(&buffer, &bufsize, stdin);
++    if (linelen < 0) {
++        perror("Error reading input");
++        free(buffer);
++        return;
++    }
++    if (linelen > 0 && buffer[linelen - 1] == '\n')
++        buffer[linelen - 1] = '\0';
++    printf("Radiation Levels: %s\n", buffer);
++    free(buffer);
++    if (function_ptr)
++        function_ptr();
++    else
++        printf("Function Pointer: %p\n", (void *)function_ptr);
++}

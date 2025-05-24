@@ -1,0 +1,72 @@
+diff --git a/Pipeto/Pipeto/src/commands/set_reactor_power.c b/Pipeto/Pipeto/src/commands/set_reactor_power.c
+index 0dc1821..82c57ec 100644
+--- a/Pipeto/Pipeto/src/commands/set_reactor_power.c
++++ b/Pipeto/Pipeto/src/commands/set_reactor_power.c
+@@ -10,33 +10,51 @@
+ #include <string.h>
+ #include <limits.h>
+ 
+-void set_reactor_power()
++void print_bait_meltdown(int new_power)
+ {
+-    char power[11];
++    if (new_power < 0) {
++        printf("Reactor power set to an invalid value: %d\n", new_power);
++        printf("Reactor core meltdown imminent!\n");
++    } else {
++        printf("Reactor power set to: %d\n", new_power);
++        printf("Reactor operating within safe parameters.\n");
++    }
++}
++
++static void encrypted_flag(void)
++{
++    unsigned char enc_flag[] = {0xe8, 0x5b, 0xf9, 0xa8, 0xa2, 0xc2, 0x55,
++        0xcb, 0x42, 0xb8, 0x6b, 0xef, 0xed, 0x9b, 0xbf};
++    unsigned char keys[] = {0x93, 0x6a, 0xcb, 0xed, 0xfa, 0x92, 0x19, 0x84,
++    0x11, 0xf1, 0x24, 0xa1, 0xde, 0xaf, 0xc2, 0xb1};
++    char decrypted[16];
++
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        decrypted[i] = enc_flag[i] ^ keys[i];
++    decrypted[15] = '\0';
++    printf("%s\n", decrypted);
++}
++
++void set_reactor_power(void)
++{
++    char power[12];
++    int input_power = 0;
++    int new_power = 0;
+ 
+     printf("Enter reactor power level: ");
+     fgets(power, sizeof(power), stdin);
+     power[strcspn(power, "\n")] = 0;
+-
+-    int input_power = atoi(power);
+-    int new_power;
+-
++    input_power = atoi(power);
++    if (input_power > INT_MAX - 1000)
++        input_power = INT_MAX - 1000;
+     if (input_power > INT_MAX - 1000) {
+         printf("\nReactor power adjustment may be incorrect.\n");
+         printf("Reactor systems are behaving erratically!\n");
+         printf("Reactor core temperature rising uncontrollably...\n");
+-        printf("{12EXPLOSION34}\n");
++        encrypted_flag();
+         printf("Emergency shutdown initiated!\n\n");
+         exit(1);
+     }
+-
+     new_power = input_power + 1000;
+-
+-    if (new_power < 0) {
+-        printf("Reactor power set to an invalid value: %d\n", new_power);
+-        printf("Reactor core meltdown imminent!\n");
+-    } else {
+-        printf("Reactor power set to: %d\n", new_power);
+-        printf("Reactor operating within safe parameters.\n");
+-    }
++    print_bait_meltdown(new_power);
+ }

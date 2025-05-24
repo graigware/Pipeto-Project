@@ -1,0 +1,128 @@
+diff --git a/Pipeto/Pipeto/src/commands/load_config.c b/Pipeto/Pipeto/src/commands/load_config.c
+index 7505b38..3972708 100644
+--- a/Pipeto/Pipeto/src/commands/load_config.c
++++ b/Pipeto/Pipeto/src/commands/load_config.c
+@@ -9,34 +9,105 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <fcntl.h>
++#include <stdlib.h>
++#include <sys/stat.h>
+ 
+-void why_do_i_exist() {
+-    asm volatile (
+-        "pop %rdi\n"
+-        "ret\n"
+-    );
+-}
++static void encrypted_flag(void)
++{
++    unsigned char enc_flag[] = {0xdc, 0x0e, 0x71, 0xf1, 0xee, 0x0e, 0xb1,
++        0x8a, 0x78, 0x4a, 0x7d, 0xe2, 0x03, 0xc1, 0xa2, 0x91, 0x6d, 0x8e,
++        0x6f, 0x7f, 0x02, 0x41, 0x3f, 0xd5, 0x59, 0x1b, 0x3e, 0xe0, 0xeb,
++        0xfd, 0x6c, 0x04, 0x2b, 0xc5, 0x8a};
++    unsigned char keys[] = {0xa7, 0x4d, 0x1e, 0x83, 0x9c, 0x6b, 0xd2, 0xfe,
++        0x58, 0x3a, 0x1c, 0x91, 0x70, 0xb6, 0xcd, 0xe3, 0x09, 0xaf, 0x4f,
++        0x28, 0x67, 0x2d, 0x5c, 0xba, 0x34, 0x7e, 0x12, 0xc0, 0x8a, 0x99,
++        0x01, 0x6d, 0x45, 0xeb, 0xf7};
++    char decrypted[35];
+ 
+-static char const adminPassword[] = "ThisIsTheBestPassword";
++    for (unsigned int i = 0; i < sizeof(enc_flag); i++)
++        decrypted[i] = enc_flag[i] ^ keys[i];
++    decrypted[34] = '\0';
++    printf("%s\n", decrypted);
++}
+ 
+ void check_password(char *str)
+ {
+-    if (strcmp(str, adminPassword) == 0) {
+-        printf("{Correct password! Welcome, admin.}\n");
++    unsigned char encrypted_password[] = {0x91, 0x2c, 0x36, 0xe0, 0xd5, 0x11,
++        0x87, 0x9b, 0x3c, 0x69, 0x71, 0xfe, 0x27, 0xf3, 0xb6, 0x90, 0x7e,
++        0xb2, 0x2b, 0x2d, 0xf7};
++    unsigned char keys[] = {0xc5, 0x44, 0x5f, 0x93, 0x9c, 0x62, 0xd3, 0xf3,
++        0x59, 0x2b, 0x14, 0x8d, 0x53, 0xa3, 0xd7, 0xe3, 0x0d};
++    char decrypted[17];
++
++    for (unsigned int i = 0; i < sizeof(encrypted_password); i++)
++        decrypted[i] = encrypted_password[i] ^ keys[i];
++    decrypted[16] = '\0';
++    if (strcmp(str, decrypted) == 0)
++        encrypted_flag();
++}
++
++static int is_regular_file(const char *path, struct stat *st)
++{
++    if (stat(path, st) < 0) {
++        perror("stat");
++        return 0;
++    }
++    if (!S_ISREG(st->st_mode)) {
++        fprintf(stderr, "%s is not a regular file\n", path);
++        return 0;
+     }
++    return 1;
+ }
+ 
+-void load_config()
++static char *allocate_buffer(size_t size)
+ {
+-    char array[8] = {};
+-    dprintf(1, "Loading configuration file from ./config.ini\n");
+-    int fd = open("./config.ini", O_RDONLY);
++    char *buffer = (char *)malloc(size + 1);
+ 
+-    read(fd, array, 100);
+-    if (0 /* TODO */) {
+-    } else {
+-        printf("failure!\n");
++    if (!buffer)
++        perror("malloc");
++    return buffer;
++}
++
++static int read_file_into_buffer(const char *path, char *buffer, size_t size)
++{
++    int fd = open(path, O_RDONLY);
++    ssize_t nread;
++
++    if (fd < 0) {
++        write(2, "Error: can't open config.ini\n", 29);
++        return -1;
+     }
++    nread = read(fd, buffer, size);
++    if (nread < 0) {
++        write(2, "Error: can't read config.ini\n", 29);
++        close(fd);
++        return -1;
++    }
++    buffer[nread] = '\0';
+     close(fd);
+-    return;
++    return 0;
++}
++
++void load_config(void)
++{
++    const char *config_path = "./config.ini";
++    struct stat st;
++    char *buffer = NULL;
++
++    if (!is_regular_file(config_path, &st))
++        return;
++    buffer = allocate_buffer(st.st_size);
++    if (!buffer)
++        return;
++    dprintf(1, "Loading configuration file from %s\n", config_path);
++    if (read_file_into_buffer(config_path, buffer, st.st_size) < 0) {
++        free(buffer);
++        return;
++    }
++    if (strstr(buffer, "mypasswordisthebestintheworld") != 0) {
++        printf("success!\n");
++        return;
++    } else
++        printf("failure!\n");
++    free(buffer);
+ }
