@@ -2,148 +2,106 @@
 
 ## 📘 Introduction
 
-<<<<<<< HEAD
-**PIPETO** est un projet de cybersécurité complet centré sur l’audit et l’exploitation d’un binaire compilé. Il simule une véritable opération Purple Team — combinant les approches offensives (Red Team) et défensives (Blue Team).
+**PIPETO** is a comprehensive cybersecurity project focused on auditing and exploiting a compiled binary. It simulates a real-life Purple Team operation — combining both offensive (Red Team) and defensive (Blue Team) strategies.
 
-Ce projet plonge les étudiants dans les réalités de l’analyse binaire, de l’exploitation de vulnérabilités et de la sécurisation de code, dans un contexte à haute pression, proche du réel.
-=======
-**PIPETO** is a cybersecurity project focused on auditing and exploiting a compiled binary. It simulates a real-world Purple Team operation — combining both offensive (Red Team) and defensive (Blue Team) strategies.
-
-The project introduces students to the realities of binary analysis, vulnerability exploitation, and secure code remediation, under realistic constraints and high-stakes narrative pressure.
->>>>>>> 69918a68465856a97b9f46ab7c7e8ca76d19ca3f
+This project immerses students in the realities of binary analysis, vulnerability exploitation, and secure code remediation, all within a high-pressure, realistic scenario.
 
 ---
 
 ## 🎯 Mission Context
 
-<<<<<<< HEAD
-Vous êtes **Application Security Engineer** chez **The Stone Corporation**, une société de cybersécurité de haut niveau. Votre équipe est mandatée par le gouvernement de la République d'Obsidienne pour sécuriser le logiciel de contrôle d'une centrale nucléaire.
+You are an **Application Security Engineer** at **The Stone Corporation**, a top-tier cybersecurity company. Your team has been contracted by the government of the Republic of Obsidia to secure the control software of a nuclear power plant.
 
-Le logiciel est fonctionnel, mais dépourvu de protections modernes. Les renseignements suggèrent une attaque numérique imminente, orchestrée par **G.O.L.E.M.** (Global Offensive for Logical Exploitation and Manipulation), une organisation d’IA renégate spécialisée dans le sabotage cybernétique.
+The software is functional but lacks modern security protections. Intelligence reports suggest an imminent cyberattack orchestrated by **G.O.L.E.M.** (Global Offensive for Logical Exploitation and Manipulation), a rogue AI organization specialized in cyber sabotage.
 
-Votre rôle ne se limite pas à l’analyse : vous devez anticiper, contrer et sécuriser face à un adversaire redoutable. Chaque bug découvert, chaque correctif appliqué, est une victoire pour la stabilité nationale.
+Your role goes beyond analysis: you must anticipate, counter, and secure the system against a formidable adversary. Every discovered bug and applied fix is a win for national stability.
 
 ---
 
 ## 🧠 Purple Team
 
-| Rôle         | Objectif                                                              |
-|--------------|-----------------------------------------------------------------------|
-| 🔴 Red Team  | Simuler les attaques, identifier les vulnérabilités, extraire des données critiques |
-| 🔵 Blue Team | Corriger les vulnérabilités, valider les corrections avec tests et patchs |
-| 🟣 Purple Team | Travailler en synergie pour assurer une couverture sécuritaire optimale |
+| Role         | Objective                                                                 |
+|--------------|---------------------------------------------------------------------------|
+| 🔴 Red Team  | Simulate attacks, identify vulnerabilities, extract critical data         |
+| 🔵 Blue Team | Fix vulnerabilities, validate patches with tests and hardening techniques |
+| 🟣 Purple Team | Collaborate to ensure optimal security coverage                         |
 
 ---
 
-## 📦 Objectifs du Projet
+## 📦 Project Objectives
 
-- ✅ Réaliser un audit Black Box (binaire + librairie dynamique uniquement).
-- ✅ Réaliser un audit White Box (accès complet au code source).
-- ✅ Identifier, classifier et documenter toutes les vulnérabilités découvertes.
-- ✅ Exploiter les failles **sans modifier le code original**.
-- ✅ Corriger les vulnérabilités en C, de façon sécurisée.
-- ✅ Écrire des tests unitaires pour valider chaque correctif.
-- ✅ Générer un fichier `.patch` par correction.
-- ✅ Rédiger un rapport de vulnérabilités clair et professionnel.
-- ✅ Défendre le projet lors d’une présentation simulée devant un comité de sécurité.
+- ✅ Perform a Black Box audit (binary + dynamic library only).
+- ✅ Perform a White Box audit (full access to source code).
+- ✅ Identify, classify, and document all discovered vulnerabilities.
+- ✅ Exploit vulnerabilities **without modifying the original code**.
+- ✅ Securely patch vulnerabilities in C.
+- ✅ Write unit tests for each patch.
+- ✅ Generate one `.patch` file per fix.
+- ✅ Write a clear and professional vulnerability report.
+- ✅ Defend the project in a simulated presentation before a security committee.
 
 ---
 
-## 🧰 Environnement & Outils
+## 🧰 Environment & Tools
 
-- **Langage** : C
-- **Système** : Linux
-- **Commande d’exécution** :
+- **Language**: C  
+- **System**: Linux  
+- **Execution Command**:
 
 ```bash
 chmod 655 ./pipeto
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD
 ```
 
-## 📝 Template du Rapport
+## 📝 Report Template
 
-### Faille X, [Nom de la commande vulnérable]
-- **Gravité** : [faible / moyenne / élevée / critique]
-- **Type** : [Buffer Overflow, Format String, Use-After-Free, etc.]
-- **Fichier** : `src/[nom_du_fichier].c`
-- **Fonction** : `[nom_de_la_fonction]`
-- **Détectée lors de** : [Audit Black Box / Audit White Box]
+### Vulnerability X — [Name of the vulnerable command]
 
-**Demonstration :**  
-[Description technique détaillée de la faille]
+- **Severity**: [low / medium / high / critical]  
+- **Type**: [Buffer Overflow, Format String, Use-After-Free, etc.]  
+- **File**: `src/[file_name].c`  
+- **Function**: `[function_name]`  
+- **Detected during**: [Black Box Audit / White Box Audit]  
 
-**Proof of Concept :**  
-[Étapes ou script permettant de reproduire l'exploitation]
+**Demonstration:**  
+[Detailed technical description of the vulnerability]
 
-**Impact :**  
-[Exécution de code à distance, crash, élévation de privilège, etc.]
+**Proof of Concept:**  
+[Steps or script to reproduce the exploit]
 
-**Résumé de la correction :**
-- [Explication claire de la solution implémentée]
-- Fichier patch : `patch/[nom_du_fichier].c.patch`
-- Test unitaire : Oui / Non
-- Couverture de test : 100% / Partielle
+**Impact:**  
+[Remote Code Execution, Crash, Privilege Escalation, etc.]
 
-## 📁 Dossier Patch
+**Summary of the Fix:**  
+[Clear explanation of the implemented fix]  
 
-**Structure du dossier**
+- **Patch file**: `patch/[file_name].c.patch`  
+- **Unit test**: Yes / No
+- **Test coverage**: lines & branchs
+
+## 📁 Pipeto Folder
+
+Contains the complete source code of the project we exploited and patched.
+
+## 📁 patch Folder
+
+**Folder structure**
 patch/
-├── faille1.patch
-├── faille2.patch
-└── faille3.patch
+├── vulnerability1.patch
+├── vulnerability2.patch
+└── vulnerability3.patch
 
-**git apply**
+**Apply a patch**
 
 ```bash
-git apply patch/[nom_fichier].patch
+git apply patch/[file_name].patch
 ```
 
-## 📁 Dossier libpipeto
+## 📁 libpipeto Folder
 
-Ce dossier contient toutes les fonctions du code source de la librairie **libpepito.so**.
-Elles ont été récupérées grâce à l'outil **ghidra** 🐉.
-=======
-You are an **Application Security Engineer** at *The Stone Corporation*, an elite cybersecurity consultancy. Your team has been contracted by the government of **The Obsidian Republic** to secure the control software of a nuclear power facility.
+This folder contains all the functions from the source code of the libpepito.so library.
+They were recovered using the Ghidra tool 🐉.
 
-The software is functionally robust, but lacks modern protections. Intelligence suggests that a digital assault is imminent, orchestrated by **G.O.L.E.M.** (Global Offensive for Logical Exploitation and Manipulation), a rogue AI-born organization specialized in cyber sabotage.
+## 📁 tests Folder
 
-Your job is not just to review code — but to outthink, outmaneuver, and out-secure this advanced adversary. Every exploit found, every bug patched, is a step toward national stability.
-
-> 🪨 *"Keep the stone in your pocket."*  
-> It's more than a motto. It's your foundation — solid, steady, unbreakable.
-
----
-
-## 🧠 Purple Team Mindset
-
-| Role       | Objective                                                                 |
-|------------|---------------------------------------------------------------------------|
-| 🔴 **Red Team**  | Simulate attacks, find vulnerabilities, extract critical data          |
-| 🔵 **Blue Team** | Fix vulnerabilities, validate corrections via unit tests and patches  |
-| 🟣 **Purple Team** | Collaborate across both sides to ensure effective security coverage  |
-
----
-
-## 📦 Project Objectives
-
-- ✅ Perform a **Black Box Audit** with only a binary and dynamic library.
-- ✅ Perform a **White Box Audit** with full access to the source code.
-- ✅ **Identify, rank, and document** all discovered vulnerabilities.
-- ✅ **Exploit** bugs without modifying the original code.
-- ✅ **Fix** vulnerabilities with secure C code.
-- ✅ Provide **unit tests** to validate each fix.
-- ✅ Generate **`.patch` files** for all modifications.
-- ✅ Write a **professional vulnerability report**.
-- ✅ Defend the project in an oral presentation simulating a security committee.
-
----
-
-## 🧰 Environment & Tools
-
-- **Language Constraint:** C (Epitech Coding Style mandatory)
-- **System:** Linux
-- **Run Instructions:**
-  ```bash
-  chmod 655 ./pipeto
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PWD
->>>>>>> 69918a68465856a97b9f46ab7c7e8ca76d19ca3f
+This folder contains all the unit tests I wrote for the project. Some of the test scores are lower than expected because I encrypted the flags, which affected the results.
