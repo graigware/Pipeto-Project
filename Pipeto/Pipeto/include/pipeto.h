@@ -75,25 +75,4 @@ typedef struct {
     void (*func)(char *);
 } commands;
 
-commands command_table[] = {
-    {"init_reactor", init_reactor},
-    {"check_reactor_status", check_reactor_status},
-    {"activate_emergency_protocols", activate_emergency_protocols},
-    {"simulate_meltdown", simulate_meltdown},
-    {"check_cooling_pressure", check_cooling_pressure},
-    {"send_status_report", send_status_report},
-    {"monitor_radiation_levels", monitor_radiation_levels},
-    {"set_reactor_power", set_reactor_power},
-    {"run_diagnostic", run_diagnostic},
-    {"enable_remote_access", enable_remote_access},
-    {"quit", quit},
-    {"help", help},
-    {"load_fuel_rods", load_fuel_rods},
-    {"log_system_event", log_system_event},
-    {"history", show_history},
-    {"load_config", load_config},
-    {"configure_cooling_system", configure_cooling_system},
-    {NULL, NULL}
-};
-
 #endif /* !PIPETO_H_ */
