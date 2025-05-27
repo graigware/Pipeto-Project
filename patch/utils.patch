@@ -1,18 +1,8 @@
 diff --git a/Pipeto/Pipeto/src/utils.c b/Pipeto/Pipeto/src/utils.c
-index 19438a3..cad4f8b 100644
+index 19438a3..3fecb1e 100644
 --- a/Pipeto/Pipeto/src/utils.c
 +++ b/Pipeto/Pipeto/src/utils.c
-@@ -1,49 +1,94 @@
-+/*
-+** EPITECH PROJECT, 2024
-+** Pipeto
-+** File description:
-+** utils
-+*/
-+
- #include "ansi-colors.h"
- #include <string.h>
- #include <unistd.h>
+@@ -4,46 +4,105 @@
  #include <stdio.h>
  #include <stdlib.h>
  #include <sys/types.h>
@@ -41,17 +31,38 @@ index 19438a3..cad4f8b 100644
 -          char home_rc[1024];
 -          snprintf(home_rc, sizeof(home_rc), "%s/.pipetorc", home);
 -          rc_file = fopen(home_rc, "r");
+-        }
+-      }
++commands command_table[] = {
++    {"init_reactor", init_reactor},
++    {"check_reactor_status", check_reactor_status},
++    {"activate_emergency_protocols", activate_emergency_protocols},
++    {"simulate_meltdown", simulate_meltdown},
++    {"check_cooling_pressure", check_cooling_pressure},
++    {"send_status_report", send_status_report},
++    {"monitor_radiation_levels", monitor_radiation_levels},
++    {"set_reactor_power", set_reactor_power},
++    {"run_diagnostic", run_diagnostic},
++    {"enable_remote_access", enable_remote_access},
++    {"quit", quit},
++    {"help", help},
++    {"load_fuel_rods", load_fuel_rods},
++    {"log_system_event", log_system_event},
++    {"history", show_history},
++    {"load_config", load_config},
++    {"configure_cooling_system", configure_cooling_system},
++    {NULL, NULL}
++};
+ 
+-    if (!rc_file) {
+-      return;
 +static int execute_command(char *cmd)
 +{
 +    for (int i = 0; command_table[i].name != NULL; i++) {
 +        if (strcmp(cmd, command_table[i].name) == 0) {
 +            command_table[i].func(cmd);
 +            return 0;
-         }
--      }
--
--    if (!rc_file) {
--      return;
++        }
      }
 +    fprintf(stderr, "Unknown command: '%s'\n", cmd);
 +    return -1;
