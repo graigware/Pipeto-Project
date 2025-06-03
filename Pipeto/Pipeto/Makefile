@@ -55,7 +55,7 @@ $(B_OBJ): CFLAGS +=
 $(G_OBJ): CFLAGS += -g3 -ggdb
 
 $(NAME): $(OBJ)
-	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS) -s -no-pie
+	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS) -s -no-pie -lcrypto
 	upx --best $(NAME)
 
 clean:
